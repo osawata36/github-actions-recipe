@@ -1,34 +1,21 @@
-name: Add PR Comment
+name: main
 
 on:
-    pull_request:
-        types:
-            - opened
+  pull_request:
+    types: [ opened, synchronize ]
 
 jobs:
-    add_comment:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Add PR Comment
-              uses: actions/github-script@v7
-              with:
-                github-token: ${{ secrets.GITHUB_TOKEN }}
-                script: |
-                        const comment = `Hello, this is a comment added by the GitHub Actions workflow!`;
-                        const { data: comments } = await github.issues.listComments({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            issue_number: context.issue.number
-                        });
-                        const existingComment = comments.find(c => c.user.login === 'github-actions[bot]' && c.body === comment);
-                        if (!existingComment) {
-                            await github.issues.createComment({
-                                owner: context.repo.owner,
-                                repo: context.repo.repo,
-                                issue_number: context.issue.number,
-                                body: comment
-                            });
-                        }
+  main:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      pull-requests: write
+    timeout-minutes: 5
+    steps:
+      - name: CommentTest
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "PRへのコメント内容をファイルに出力する" > /tmp/comment
+          gh pr comment "${PR_NUMBER}" -F /tmp/comment
