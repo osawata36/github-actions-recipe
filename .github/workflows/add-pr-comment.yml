@@ -12,7 +12,10 @@ jobs:
       pull-requests: write
     timeout-minutes: 5
     steps:
-      - name: CommentTest
+        # ソースコードをGitからチェックアウト
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Add Comment
         env:
           PR_NUMBER: ${{ github.event.number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
